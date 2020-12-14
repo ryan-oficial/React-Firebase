@@ -5,7 +5,6 @@ import logo from '../../assets/img/Logo.svg';
 import { Container, Form, Button} from 'react-bootstrap';
 import './index.css';
 
-
 const Login = () => {
     const firebase = useFirebaseApp();
 
@@ -19,7 +18,8 @@ const Login = () => {
 
         firebase.auth().signInWithEmailAndPassword(email, senha)
         .then(result => {
-            console.log(result);
+            localStorage.setItem('nyous' + result.user.refreshToken);
+            alert('Seja bem vindo');
         })
         .catch(error => {
             alert('Email ou Senha invalidos')

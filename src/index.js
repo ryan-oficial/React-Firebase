@@ -3,19 +3,19 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import Login from './pages/login';
 import Register from './pages/register';
+import EventosPage from '../src/pages/eventos'
 import reportWebVitals from './reportWebVitals';
 
-import {firebaseAppProvider} from 'reactfire';
+import {FirebaseAppProvider} from 'reactfire';
 import firebaseConfig from './utils/firebaseConfig';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 ReactDOM.render(
   <React.StrictMode>
-    <firebaseAppProvider firebaseConfig={firebaseConfig}>
-    <Login />
-    </firebaseAppProvider>
-
+    <FirebaseAppProvider firebaseConfig={firebaseConfig}>
+    <EventosPage />
+    </FirebaseAppProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );
