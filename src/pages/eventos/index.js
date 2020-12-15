@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button,Container, Row, Cal, Card, Form} from 'react-bootstrap';
-import { db } from '../../utils/firebaseConfig';
+import { db, storage } from '../../utils/firebaseConfig';
+import FileUploader from 'react-firebase-file-uploader';
 
 const EventosPage = () => {
-    const [eventos, setEventos] = useState([]);
     const [id, setId] = useState(0);
     const [nome, setNome] = useState('');
     const [descricao, setDescricao] = useState('');
+    const [urlImagem, setUrlImagem] = useState('');
+
+    const [eventos, setEventos] = useState([]);
+
 
     const _dbEventos = db.collection('eventos');
 
@@ -24,7 +28,8 @@ const EventosPage = () => {
                     return {
                         id : doc.id,
                         nome : doc.data().nome,
-                        descricao : doc.data().descricao
+                        descricao : doc.data().descricao,
+                        urlImagem : doc.data().urlImagem
                 }
                 });
                 setEventos(data)
@@ -45,6 +50,7 @@ const EventosPage = () => {
                 setId(result.id);
                 setNome(result.data().nome);
                 setDescricao(result.data().descricao);
+                setUrlImagem(doc.data().urlImagem)
             })
         } catch (error) {
             console.error(error)
@@ -73,6 +79,7 @@ const EventosPage = () => {
         const evento = {
             nome : nome,
             descricao : descricao,
+            urlImagem : urlImagem,
         }
         if(id === 0){
             db.collection('eventos')
@@ -105,15 +112,31 @@ const EventosPage = () => {
     const limparCampos = () => {
         setId(0);
             setNome('');
-            // setUrlImagem('');
+            setUrlImagem('');
             // setLink('');
             // setCategoriaId('');
             setDescricao('');
+
+    }
+
+    const handleUploadError = error =>{
+        console.error(error);
     }
  
+    const handleUploadSuccess = filename => {
+        console.log('Sucesso upload: '+ filename)
+
+        storage
+        .ref('imagens')
+        .child(filename)
+        .getDownloadURL()
+        .then(url => setUrlImagem(url))
+        .catch(error => console.error(error))
+    }
     return(
         <div>
             <Container>
+
                 <h1>Eventos</h1>
                 <p>Gerencie seus eventos</p>
                 {/* <Titulo titulo="Eventos" chamada="Gerencie seus eventos" /> */}
@@ -122,6 +145,21 @@ const EventosPage = () => {
                         <Card.Body>
                             
                             <Form onSubmit={event => salvar(event)}>
+                              <Form.Group>
+                                  {urlImagem && <img src={urlImagem} style={{width : '200px'}}/>}
+                                  <label style={{backgroundColor: 'steelblue', color: 'white', padding: 10, borderRadius: 4, cursor: 'pointer'}}>
+                                            Selecione a imagem
+                                    <FileUploader
+                                        hidden
+                                        accept="image/s"
+                                        name="urlImagem"
+                                        randomizeFilename
+                                        storageRef={storage.ref('imagens')}
+                                        onUploadError={handleUploadError}
+                                        onUploadSuccess={handleUploadSuccess}
+                                    />
+                              </label>
+                              </Form.Group>
                                 <Form.Group controlId="formNome">
                                     <Form.Label>Nome</Form.Label>
                                     <Form.Control type="text" value={nome} onChange={event => setNome(event.target.value)}/>
@@ -165,12 +203,12 @@ const EventosPage = () => {
                                                <Table bordered>
                                                    <thead>
                                                        <tr>
-                                                           {/* <th>Imagem</th> */}
+                                                           <th>Imagem</th>
                                                            <th>Nome</th>
                                                            {/* <th>Link</th> */}
                                                            <th>Descrição</th>
-                                                           {/* <th>Categoria</th>
-                                                           <th>Açoes</th> */}
+                                                           {/* <th>Categoria</th> */}
+                                                           <th>Açoes</th>                                                       
                                                        </tr>
                                                    </thead>
                                                    <tbody>
@@ -178,7 +216,7 @@ const EventosPage = () => {
                                                        eventos.map((item, index) =>{
                                                            return(
                                                                <tr key={index}>
-                                                                   {/* <td><img src={item.urlImagem} style={{ width : '120px'}}></img></td> */}
+                                                                   <td><img src={item.urlImagem} style={{ width : '120px'}}></img></td>
                                                                    <td>{item.nome}</td>
                                                                    {/* <td><a href={item.link} target="_blank">Ir para o Evento</a></td> */}
                                                                    <td>{item.descricao}</td>
