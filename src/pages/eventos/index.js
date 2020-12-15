@@ -50,7 +50,7 @@ const EventosPage = () => {
                 setId(result.id);
                 setNome(result.data().nome);
                 setDescricao(result.data().descricao);
-                setUrlImagem(doc.data().urlImagem)
+                setUrlImagem(result.data().urlImagem)
             })
         } catch (error) {
             console.error(error)
